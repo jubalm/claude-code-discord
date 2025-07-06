@@ -1,0 +1,48 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ## Changes
+          
+          See [CHANGELOG.md](CHANGELOG.md) for details.
+          
+          ## Installation
+          
+          ```bash
+          curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/install.sh | bash
+          ```
+          
+          ## Quick Start
+          
+          1. Navigate to your project directory
+          2. Setup Discord integration: `/user:discord:setup YOUR_WEBHOOK_URL`
+          3. Enable notifications: `/user:discord:start`
+          4. Start working and receive Discord notifications!
+          
+          ## Documentation
+          
+          - [README.md](README.md) - Full documentation
+          - [PROJECT-LEVEL-DISCORD-INTEGRATION.md](docs/PROJECT-LEVEL-DISCORD-INTEGRATION.md) - Detailed guide
+        draft: false
+        prerelease: false
