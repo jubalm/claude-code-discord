@@ -1,10 +1,10 @@
 ---
 description: Stop Discord notifications for this project
-allowed-tools: Bash(jq:*)
+allowed-tools: Bash(python3:*)
 ---
 
 ! if [ -f ".claude/discord-state.json" ]; then
-    jq '.active = false' .claude/discord-state.json > .claude/discord-state-tmp.json && mv .claude/discord-state-tmp.json .claude/discord-state.json
+    python3 "$HOME/.claude/commands/discord/update-state.py" .claude/discord-state.json stop
     echo "🔕 Discord notifications disabled for project: $(basename $(pwd))"
   else
     echo "ℹ️  No Discord configuration found for this project"

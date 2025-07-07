@@ -1,16 +1,16 @@
 ---
 description: Show Discord integration status for this project
-allowed-tools: Bash(jq:*), Bash(cat:*)
+allowed-tools: Bash(python3:*), Bash(cat:*)
 ---
 
 ! if [ -f ".claude/discord-state.json" ]; then
     echo "📊 Discord Status for $(basename $(pwd))"
     echo "=================================="
     
-    ACTIVE=$(jq -r '.active // false' .claude/discord-state.json)
-    PROJECT_NAME=$(jq -r '.project_name // "unknown"' .claude/discord-state.json)
-    THREAD_ID=$(jq -r '.thread_id // ""' .claude/discord-state.json)
-    HAS_AUTH=$(jq -r '.auth_token // ""' .claude/discord-state.json)
+    ACTIVE=$(python3 "$HOME/.claude/commands/discord/read-state.py" .claude/discord-state.json active false)
+    PROJECT_NAME=$(python3 "$HOME/.claude/commands/discord/read-state.py" .claude/discord-state.json project_name unknown)
+    THREAD_ID=$(python3 "$HOME/.claude/commands/discord/read-state.py" .claude/discord-state.json thread_id)
+    HAS_AUTH=$(python3 "$HOME/.claude/commands/discord/read-state.py" .claude/discord-state.json auth_token)
     
     echo "Project: $PROJECT_NAME"
     echo "Status: $([ "$ACTIVE" = "true" ] && echo "🟢 Active" || echo "🔴 Disabled")"

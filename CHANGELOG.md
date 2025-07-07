@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2025-01-07
+
+### Added
+- 🐍 **Python-first implementation** - Eliminates external dependencies (`jq`, `curl`)
+- 🏗️ **Consistent naming convention** - All hooks follow `{event-type}-discord.py` pattern
+- 🛠️ **Utility scripts** - Modular Python scripts for JSON operations
+- ⚡ **Better error handling** - Native Python exception handling vs shell error codes
+- 🔧 **Maintainable codebase** - More readable and debuggable Python code
+
+### Changed
+- **Hook scripts converted to Python**:
+  - `discord-notify.sh` → `stop-discord.py`
+  - `notification-discord.sh` → `notification-discord.py` 
+  - `posttooluse-discord.sh` → `posttooluse-discord.py`
+- **Slash commands updated** to use Python for JSON operations
+- **Installation script** now installs Python versions alongside shell backups
+
+### Improved
+- **Zero external dependencies** - Only requires Python (universally available)
+- **Native JSON processing** - Proper parsing vs shell string manipulation
+- **Enhanced logging** - Python logging vs echo-to-file
+- **Faster execution** - Python startup vs multiple shell subprocess calls
+
+### Backward Compatibility
+- Shell hook scripts maintained as backup
+- Existing configurations continue to work
+- Non-breaking changes to slash commands
+
 ## [0.0.1-beta] - 2025-01-06
 
 ### Added

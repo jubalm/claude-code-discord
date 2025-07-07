@@ -108,12 +108,22 @@ backup_existing() {
 install_hooks() {
     log_info "Installing hook scripts..."
     
-    # Copy hook scripts
+    # Copy Python hook scripts (primary)
+    cp hooks/stop-discord.py "$HOOKS_DIR/"
+    cp hooks/posttooluse-discord.py "$HOOKS_DIR/"
+    cp hooks/notification-discord.py "$HOOKS_DIR/"
+    
+    # Copy shell hook scripts (backup)
     cp hooks/discord-notify.sh "$HOOKS_DIR/"
     cp hooks/posttooluse-discord.sh "$HOOKS_DIR/"
     cp hooks/notification-discord.sh "$HOOKS_DIR/"
     
-    # Make scripts executable
+    # Make Python scripts executable
+    chmod +x "${HOOKS_DIR}/stop-discord.py"
+    chmod +x "${HOOKS_DIR}/posttooluse-discord.py"
+    chmod +x "${HOOKS_DIR}/notification-discord.py"
+    
+    # Make shell scripts executable
     chmod +x "${HOOKS_DIR}/discord-notify.sh"
     chmod +x "${HOOKS_DIR}/posttooluse-discord.sh"
     chmod +x "${HOOKS_DIR}/notification-discord.sh"
@@ -137,14 +147,23 @@ verify_installation() {
     
     local errors=0
     
-    # Check hook scripts
-    for script in discord-notify.sh posttooluse-discord.sh notification-discord.sh; do
+    # Check Python hook scripts (primary)
+    for script in stop-discord.py posttooluse-discord.py notification-discord.py; do
         if [ ! -f "${HOOKS_DIR}/$script" ]; then
-            log_error "Hook script not found: $script"
+            log_error "Python hook script not found: $script"
             ((errors++))
         elif [ ! -x "${HOOKS_DIR}/$script" ]; then
-            log_error "Hook script not executable: $script"
+            log_error "Python hook script not executable: $script"
             ((errors++))
+        fi
+    done
+    
+    # Check shell hook scripts (backup)
+    for script in discord-notify.sh posttooluse-discord.sh notification-discord.sh; do
+        if [ ! -f "${HOOKS_DIR}/$script" ]; then
+            log_warning "Shell hook script not found: $script"
+        elif [ ! -x "${HOOKS_DIR}/$script" ]; then
+            log_warning "Shell hook script not executable: $script"
         fi
     done
     
@@ -152,6 +171,17 @@ verify_installation() {
     for cmd in setup.md start.md stop.md status.md; do
         if [ ! -f "${COMMANDS_DIR}/discord/$cmd" ]; then
             log_error "Command not found: discord/$cmd"
+            ((errors++))
+        fi
+    done
+    
+    # Check Python utility scripts
+    for script in merge-settings.py update-state.py read-state.py; do
+        if [ ! -f "${COMMANDS_DIR}/discord/$script" ]; then
+            log_error "Python utility script not found: discord/$script"
+            ((errors++))
+        elif [ ! -x "${COMMANDS_DIR}/discord/$script" ]; then
+            log_error "Python utility script not executable: discord/$script"
             ((errors++))
         fi
     done

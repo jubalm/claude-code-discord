@@ -1,6 +1,6 @@
 ---
 description: Start Discord notifications for this project (channel or thread)
-allowed-tools: Bash(jq:*), Bash(echo:*), Bash(mkdir:*)
+allowed-tools: Bash(python3:*), Bash(echo:*), Bash(mkdir:*)
 ---
 
 ! mkdir -p .claude
@@ -13,12 +13,12 @@ allowed-tools: Bash(jq:*), Bash(echo:*), Bash(mkdir:*)
 
 ! if [ -n "$ARGUMENTS" ]; then
     # Update existing config with specific thread ID
-    jq --arg thread_id "$ARGUMENTS" '.active = true | .thread_id = $thread_id' .claude/discord-state.json > .claude/discord-state-tmp.json && mv .claude/discord-state-tmp.json .claude/discord-state.json
+    python3 "$HOME/.claude/commands/discord/update-state.py" .claude/discord-state.json start "$ARGUMENTS"
     echo "✅ Discord notifications enabled for thread: $ARGUMENTS"
   else
     # Enable notifications with existing config
-    jq '.active = true' .claude/discord-state.json > .claude/discord-state-tmp.json && mv .claude/discord-state-tmp.json .claude/discord-state.json
-    THREAD_ID=$(jq -r '.thread_id // ""' .claude/discord-state.json)
+    python3 "$HOME/.claude/commands/discord/update-state.py" .claude/discord-state.json start
+    THREAD_ID=$(python3 "$HOME/.claude/commands/discord/update-state.py" .claude/discord-state.json get_thread_id)
     if [ -n "$THREAD_ID" ] && [ "$THREAD_ID" != "" ]; then
       echo "✅ Discord notifications enabled for thread: $THREAD_ID"
     else

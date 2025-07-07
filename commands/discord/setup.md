@@ -1,6 +1,6 @@
 ---
 description: Setup Discord integration for this project (configurable and non-destructive)
-allowed-tools: Bash(jq:*), Bash(echo:*), Bash(mkdir:*), Bash(cat:*), Bash(read:*)
+allowed-tools: Bash(python3:*), Bash(echo:*), Bash(mkdir:*), Bash(cat:*), Bash(read:*)
 ---
 
 ! mkdir -p .claude
@@ -78,43 +78,7 @@ EOF
     cp .claude/settings.json .claude/settings.json.backup
     
     # Merge Discord hooks with existing configuration
-    jq '. + {
-      "hooks": (.hooks // {}) + {
-        "Stop": [
-          {
-            "matcher": "",
-            "hooks": [
-              {
-                "type": "command",
-                "command": "$HOME/.claude/hooks/discord-notify.sh"
-              }
-            ]
-          }
-        ],
-        "Notification": [
-          {
-            "matcher": "",
-            "hooks": [
-              {
-                "type": "command",
-                "command": "$HOME/.claude/hooks/notification-discord.sh"
-              }
-            ]
-          }
-        ],
-        "PostToolUse": [
-          {
-            "matcher": "",
-            "hooks": [
-              {
-                "type": "command",
-                "command": "$HOME/.claude/hooks/posttooluse-discord.sh"
-              }
-            ]
-          }
-        ]
-      }
-    }' .claude/settings.json > .claude/settings-tmp.json && mv .claude/settings-tmp.json .claude/settings.json
+    python3 "$HOME/.claude/commands/discord/merge-settings.py" .claude/settings.json
     
     echo "✅ Discord hooks merged with existing configuration"
     echo "📁 Backup saved as .claude/settings.json.backup"
@@ -130,7 +94,7 @@ EOF
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/discord-notify.sh"
+            "command": "$HOME/.claude/hooks/stop-discord.py"
           }
         ]
       }
@@ -141,7 +105,7 @@ EOF
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/notification-discord.sh"
+            "command": "$HOME/.claude/hooks/notification-discord.py"
           }
         ]
       }
@@ -152,7 +116,7 @@ EOF
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/posttooluse-discord.sh"
+            "command": "$HOME/.claude/hooks/posttooluse-discord.py"
           }
         ]
       }
