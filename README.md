@@ -16,13 +16,13 @@ Get real-time Discord notifications when Claude completes tasks, needs input, or
 ## 🚀 Quick Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/USERNAME/claude-discord-integration/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/install.sh | bash
 ```
 
 Or clone and install manually:
 
 ```bash
-git clone https://github.com/USERNAME/claude-discord-integration.git
+git clone https://github.com/jubalm/claude-code-discord.git
 cd claude-discord-integration
 chmod +x install.sh
 ./install.sh

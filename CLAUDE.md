@@ -17,7 +17,7 @@ chmod +x install.sh
 ./install.sh
 
 # Or quick install
-curl -fsSL https://raw.githubusercontent.com/USERNAME/claude-discord-integration/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/install.sh | bash
 ```
 
 ### Uninstall
