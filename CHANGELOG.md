@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-07-07
+
+### 🐛 Critical Bug Fix
+- **Fixed remaining HTTP 403 errors in global hooks** - Updated global Python hook installations to include User-Agent headers
+
+### 🧪 Verification  
+- **End-to-end testing confirmed** - All notification types now working correctly without HTTP errors
+- **Complete functionality restored** - PostToolUse, Stop, and Notification hooks all sending Discord messages successfully
+
 ## [0.2.0] - 2025-07-07
 
 ### 🐛 Critical Bug Fixes
