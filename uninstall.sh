@@ -38,9 +38,9 @@ check_installation() {
     local found_components=()
     
     # Check for hook scripts
-    [ -f "${HOOKS_DIR}/discord-notify.sh" ] && found_components+=("discord-notify.sh")
-    [ -f "${HOOKS_DIR}/posttooluse-discord.sh" ] && found_components+=("posttooluse-discord.sh")
-    [ -f "${HOOKS_DIR}/notification-discord.sh" ] && found_components+=("notification-discord.sh")
+    [ -f "${HOOKS_DIR}/stop-discord.py" ] && found_components+=("stop-discord.py")
+    [ -f "${HOOKS_DIR}/posttooluse-discord.py" ] && found_components+=("posttooluse-discord.py")
+    [ -f "${HOOKS_DIR}/notification-discord.py" ] && found_components+=("notification-discord.py")
     
     # Check for commands
     [ -d "${COMMANDS_DIR}/discord" ] && found_components+=("discord commands")
@@ -63,9 +63,9 @@ create_backup() {
     mkdir -p "$backup_dir"
     
     # Backup hook scripts
-    [ -f "${HOOKS_DIR}/discord-notify.sh" ] && cp "${HOOKS_DIR}/discord-notify.sh" "$backup_dir/"
-    [ -f "${HOOKS_DIR}/posttooluse-discord.sh" ] && cp "${HOOKS_DIR}/posttooluse-discord.sh" "$backup_dir/"
-    [ -f "${HOOKS_DIR}/notification-discord.sh" ] && cp "${HOOKS_DIR}/notification-discord.sh" "$backup_dir/"
+    [ -f "${HOOKS_DIR}/stop-discord.py" ] && cp "${HOOKS_DIR}/stop-discord.py" "$backup_dir/"
+    [ -f "${HOOKS_DIR}/posttooluse-discord.py" ] && cp "${HOOKS_DIR}/posttooluse-discord.py" "$backup_dir/"
+    [ -f "${HOOKS_DIR}/notification-discord.py" ] && cp "${HOOKS_DIR}/notification-discord.py" "$backup_dir/"
     
     # Backup commands
     [ -d "${COMMANDS_DIR}/discord" ] && cp -r "${COMMANDS_DIR}/discord" "$backup_dir/"
@@ -79,7 +79,7 @@ remove_hooks() {
     
     local removed=0
     
-    for script in discord-notify.sh posttooluse-discord.sh notification-discord.sh; do
+    for script in stop-discord.py posttooluse-discord.py notification-discord.py; do
         if [ -f "${HOOKS_DIR}/$script" ]; then
             rm -f "${HOOKS_DIR}/$script"
             log_success "Removed $script"
@@ -113,9 +113,9 @@ verify_removal() {
     local remaining=()
     
     # Check for remaining files
-    [ -f "${HOOKS_DIR}/discord-notify.sh" ] && remaining+=("discord-notify.sh")
-    [ -f "${HOOKS_DIR}/posttooluse-discord.sh" ] && remaining+=("posttooluse-discord.sh")
-    [ -f "${HOOKS_DIR}/notification-discord.sh" ] && remaining+=("notification-discord.sh")
+    [ -f "${HOOKS_DIR}/stop-discord.py" ] && remaining+=("stop-discord.py")
+    [ -f "${HOOKS_DIR}/posttooluse-discord.py" ] && remaining+=("posttooluse-discord.py")
+    [ -f "${HOOKS_DIR}/notification-discord.py" ] && remaining+=("notification-discord.py")
     [ -d "${COMMANDS_DIR}/discord" ] && remaining+=("discord commands")
     
     if [ ${#remaining[@]} -eq 0 ]; then

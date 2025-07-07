@@ -27,6 +27,17 @@ chmod +x uninstall.sh
 ./uninstall.sh
 ```
 
+### Remove Project Integration
+```bash
+# Remove Discord integration from current project only
+/user:discord:remove
+
+# This removes:
+# - .claude/discord-state.json
+# - Discord hooks from .claude/settings.json
+# - Preserves other hooks and global components
+```
+
 ### Project Setup (in any project directory)
 ```bash
 # Basic setup
@@ -43,12 +54,15 @@ chmod +x uninstall.sh
 
 # Disable notifications
 /user:discord:stop
+
+# Remove project integration
+/user:discord:remove
 ```
 
 ## Architecture
 
 ### Global Components (`~/.claude/`)
-- **Hook Scripts**: `hooks/discord-notify.sh`, `hooks/posttooluse-discord.sh`, `hooks/notification-discord.sh`
+- **Hook Scripts**: `hooks/stop-discord.py`, `hooks/posttooluse-discord.py`, `hooks/notification-discord.py`
 - **Slash Commands**: `commands/discord/` (setup.md, start.md, stop.md, status.md)
 - **No Global Settings**: Global settings.json has no hooks configured
 
@@ -70,7 +84,7 @@ Projects without `.claude/discord-state.json` receive **no notifications** - thi
 
 ## Hook Script Logic
 
-Each hook script (`hooks/discord-notify.sh`, etc.) follows this pattern:
+Each Python hook script follows this pattern:
 1. Check if `.claude/discord-state.json` exists (exit silently if not)
 2. Parse Discord configuration from the state file
 3. Verify `"active": true` (exit if false)
@@ -81,9 +95,9 @@ Each hook script (`hooks/discord-notify.sh`, etc.) follows this pattern:
 ## File Structure Analysis
 
 ### Core Hook Scripts
-- `hooks/discord-notify.sh`: Main notification handler for Stop/Notification/PostToolUse events
-- `hooks/posttooluse-discord.sh`: Specific handler for tool completion events
-- `hooks/notification-discord.sh`: Specific handler for input-needed events
+- `hooks/stop-discord.py`: Handler for Stop events (session completion)
+- `hooks/posttooluse-discord.py`: Handler for tool completion events
+- `hooks/notification-discord.py`: Handler for input-needed events
 
 ### Slash Commands (Custom Claude Code Commands)
 - `commands/discord/setup.md`: Creates project config and hooks
@@ -119,9 +133,9 @@ Required tools:
 ```json
 {
   "hooks": {
-    "Stop": [{"matcher": "", "hooks": [{"type": "command", "command": "$HOME/.claude/hooks/discord-notify.sh"}]}],
-    "Notification": [{"matcher": "", "hooks": [{"type": "command", "command": "$HOME/.claude/hooks/notification-discord.sh"}]}],
-    "PostToolUse": [{"matcher": "", "hooks": [{"type": "command", "command": "$HOME/.claude/hooks/posttooluse-discord.sh"}]}]
+    "Stop": [{"matcher": "", "hooks": [{"type": "command", "command": "$HOME/.claude/hooks/stop-discord.py"}]}],
+    "Notification": [{"matcher": "", "hooks": [{"type": "command", "command": "$HOME/.claude/hooks/notification-discord.py"}]}],
+    "PostToolUse": [{"matcher": "", "hooks": [{"type": "command", "command": "$HOME/.claude/hooks/posttooluse-discord.py"}]}]
   }
 }
 ```
@@ -131,13 +145,13 @@ Required tools:
 ### Testing Hook Scripts
 ```bash
 # Test hook manually
-echo '{"session_id": "test", "hook_type": "Stop"}' | ~/.claude/hooks/discord-notify.sh
+echo '{"session_id": "test", "hook_type": "Stop"}' | python3 ~/.claude/hooks/stop-discord.py
 
 # Check logs
 tail -f ~/.claude/discord-notifications.log
 
 # Verify script permissions
-ls -la ~/.claude/hooks/discord*.sh
+ls -la ~/.claude/hooks/*discord*.py
 ```
 
 ### Testing Slash Commands

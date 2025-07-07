@@ -37,18 +37,9 @@ log_error() {
 check_dependencies() {
     log_info "Checking dependencies..."
     
-    # Check for jq
-    if ! command -v jq &> /dev/null; then
-        log_error "jq is required but not installed. Please install jq first:"
-        echo "  macOS: brew install jq"
-        echo "  Ubuntu/Debian: sudo apt-get install jq"
-        echo "  CentOS/RHEL: sudo yum install jq"
-        exit 1
-    fi
-    
-    # Check for curl
-    if ! command -v curl &> /dev/null; then
-        log_error "curl is required but not installed."
+    # Check for Python 3
+    if ! command -v python3 &> /dev/null; then
+        log_error "python3 is required but not installed."
         exit 1
     fi
     
@@ -108,25 +99,15 @@ backup_existing() {
 install_hooks() {
     log_info "Installing hook scripts..."
     
-    # Copy Python hook scripts (primary)
+    # Copy Python hook scripts
     cp hooks/stop-discord.py "$HOOKS_DIR/"
     cp hooks/posttooluse-discord.py "$HOOKS_DIR/"
     cp hooks/notification-discord.py "$HOOKS_DIR/"
-    
-    # Copy shell hook scripts (backup)
-    cp hooks/discord-notify.sh "$HOOKS_DIR/"
-    cp hooks/posttooluse-discord.sh "$HOOKS_DIR/"
-    cp hooks/notification-discord.sh "$HOOKS_DIR/"
     
     # Make Python scripts executable
     chmod +x "${HOOKS_DIR}/stop-discord.py"
     chmod +x "${HOOKS_DIR}/posttooluse-discord.py"
     chmod +x "${HOOKS_DIR}/notification-discord.py"
-    
-    # Make shell scripts executable
-    chmod +x "${HOOKS_DIR}/discord-notify.sh"
-    chmod +x "${HOOKS_DIR}/posttooluse-discord.sh"
-    chmod +x "${HOOKS_DIR}/notification-discord.sh"
     
     log_success "Hook scripts installed"
 }
@@ -203,7 +184,7 @@ main() {
     echo ""
     
     # Check if script is being run from the correct directory
-    if [ ! -f "hooks/discord-notify.sh" ] || [ ! -d "commands/discord" ]; then
+    if [ ! -f "hooks/stop-discord.py" ] || [ ! -d "commands/discord" ]; then
         log_error "Please run this script from the claude-discord-integration directory"
         log_error "The directory should contain 'hooks/' and 'commands/' subdirectories"
         exit 1

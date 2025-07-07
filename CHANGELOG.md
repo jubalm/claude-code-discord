@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-07-07
+
+### 🐛 Critical Bug Fixes
+- **Fixed HTTP 403 Forbidden errors** - Added required User-Agent headers to all Python webhook requests
+- **Fixed broken uninstall script** - Updated to properly handle Python files instead of shell scripts
+- **Fixed broken install script** - Removed references to non-existent shell scripts
+
+### ✨ New Features
+- **Project-level removal command** - New `/user:discord:remove` slash command for clean project-specific removal
+- **Smart hook preservation** - Removal command preserves non-Discord hooks when cleaning up Discord integration
+- **Complete install/uninstall symmetry** - Uninstall script removes exactly what install script adds
+
+### 🏗️ Architecture Improvements
+- **Pure Python implementation** - Completely removed all shell scripts (.sh files) from the codebase
+- **Reduced dependencies** - Removed `jq` and `curl` requirements, now only needs Python 3
+- **Consistent documentation** - Updated all references from shell scripts to Python scripts
+
+### 🧪 Testing Improvements
+- **End-to-end validation** - Comprehensive testing of install → use → uninstall → reinstall cycle
+- **Webhook validation** - Improved Discord webhook URL testing and validation
+- **Error handling** - Better error messages and recovery for common issues
+
+### 📁 Repository Changes
+- **Added**: `commands/discord/remove.md` - Project-level removal command
+- **Removed**: All `.sh` files from `hooks/` directory
+- **Updated**: `install.sh` and `uninstall.sh` for Python-only operation
+
 ## [0.1.1] - 2025-01-07
 
 ### Fixed
