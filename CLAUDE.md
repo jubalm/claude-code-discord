@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is **Claude Code Discord Notification** (version 0.1.0) - a system that provides project-scoped Discord notifications for Claude Code sessions. Stay informed about your Claude Code sessions with real-time Discord notifications - know what Claude is working on even when you're away from your computer.
+This is **Claude Code Discord Notification** (version 0.1.1) - a system that provides project-scoped Discord notifications for Claude Code sessions. Stay informed about your Claude Code sessions with real-time Discord notifications - know what Claude is working on even when you're away from your computer.
 
 The system uses Python scripts, shell hooks, and custom slash commands to send real-time notifications when Claude completes tasks, needs input, or makes progress on projects.
 
