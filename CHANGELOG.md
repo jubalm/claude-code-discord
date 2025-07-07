@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2025-07-08
+
+### 📚 Documentation Updates
+- **Updated README.md** - Removed outdated `jq` and `curl` dependencies from requirements
+- **Fixed troubleshooting section** - Updated script references from `.sh` to `.py` files
+- **Corrected uninstall instructions** - Fixed repository URL and script file patterns
+- **Complete documentation alignment** - README now accurately reflects v0.2.0+ pure Python architecture
+
 ## [0.2.1] - 2025-07-07
 
 ### 🐛 Critical Bug Fix

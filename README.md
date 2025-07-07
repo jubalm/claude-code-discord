@@ -31,8 +31,7 @@ chmod +x install.sh
 ## 📋 Requirements
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed
-- `jq` for JSON processing
-- `curl` for HTTP requests
+- Python 3 (universally available)
 - Discord webhook URL
 
 ## 🎯 Quick Start
@@ -161,17 +160,17 @@ Team members can then add their own webhook:
 
 1. Verify scripts exist and are executable:
    ```bash
-   ls -la ~/.claude/hooks/discord*.sh
+   ls -la ~/.claude/hooks/*discord*.py
    ```
 
 2. Test script manually:
    ```bash
-   echo '{}' | ~/.claude/hooks/discord-notify.sh
+   echo '{}' | ~/.claude/hooks/stop-discord.py
    ```
 
 3. Check script permissions:
    ```bash
-   chmod +x ~/.claude/hooks/discord*.sh
+   chmod +x ~/.claude/hooks/*discord*.py
    ```
 
 ### Commands Not Available
@@ -192,10 +191,10 @@ Team members can then add their own webhook:
 
 ```bash
 # Download and run uninstall script
-curl -fsSL https://raw.githubusercontent.com/USERNAME/claude-discord-integration/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/uninstall.sh | bash
 
 # Or manually remove files
-rm -f ~/.claude/hooks/discord*.sh
+rm -f ~/.claude/hooks/*discord*.py
 rm -rf ~/.claude/commands/discord
 ```
 
