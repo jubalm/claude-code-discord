@@ -18,12 +18,14 @@ Get real-time Discord notifications when Claude completes tasks, needs input, or
 ## 🚀 Quick Install
 
 ### 🏠 Local Installation (Recommended)
-Perfect for single projects - everything installs to your current project:
+Perfect for single projects - everything installs to your current project with automatic setup:
 
 ```bash
 cd your-project
 curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/install.sh | bash
 ```
+
+**New in v0.3.2**: Automatic hook registration! Discord hooks are now automatically registered in `.claude/settings.json` during local installation.
 
 ### 🌐 Global Installation (Advanced)
 For managing multiple projects with shared Discord integration:
