@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is **Claude Code Discord Notification** (version 0.3.0) - a **local-first** Discord notification system for Claude Code sessions. Stay informed about your coding sessions with real-time Discord notifications - know what Claude is working on even when you're away from your computer.
+This is **Claude Code Discord Notification** (version 0.4.0) - a **local-first** Discord notification system for Claude Code sessions. Stay informed about your coding sessions with real-time Discord notifications - know what Claude is working on even when you're away from your computer.
 
 **Local-First Architecture**: By default, Discord integration installs directly to your current project (`.claude/` directory), making setup simple and self-contained. Advanced users can optionally install globally for multi-project workflows.
 

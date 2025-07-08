@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-07-09
+
+### 🐍 Python-Enhanced Slash Commands
+- **Unified command architecture** - All slash commands now use shared `discord_utils.py` module for consistent behavior
+- **Enhanced user experience** - Uniform output formatting and error messages across all commands
+- **Improved error handling** - Comprehensive validation with user-friendly error messages for edge cases
+- **Better path detection** - Local-first, global-fallback architecture for flexible installation support
+- **Centralized utilities** - Common functions for JSON handling, validation, and formatting
+
+### 🎯 Command Improvements
+- **Setup command** - Enhanced webhook URL validation and argument parsing
+- **Status command** - Detailed configuration display with installation type detection
+- **Start/Stop commands** - Consistent state management and user feedback
+- **Remove command** - Safe cleanup with backup creation and selective removal
+- **All commands** - Standardized help text and error messages
+
+### 🧪 Quality Assurance
+- **Comprehensive testing** - All 21 test cases passed covering setup, status, start/stop, remove, error handling, and path detection
+- **Production-ready** - Robust error handling for malformed JSON, missing configuration, and invalid inputs
+- **Backward compatibility** - Fully compatible with existing installations and configurations
+
+### 🔧 Technical Enhancements
+- **Code maintainability** - Centralized utilities eliminate code duplication
+- **Consistent patterns** - Unified approach to argument parsing and state management
+- **Better debugging** - Improved error messages and status reporting
+- **Documentation cleanup** - Streamlined project documentation for better performance
+
+### 📋 Migration Notes
+- **No breaking changes** - Existing installations continue to work without modification
+- **Enhanced functionality** - Better error handling and user feedback automatically available
+- **Improved reliability** - More robust handling of edge cases and configuration errors
+
 ## [0.3.2] - 2025-07-09
 
 ### 🚀 Enhanced Installation Experience

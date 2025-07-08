@@ -14,6 +14,7 @@ Get real-time Discord notifications when Claude completes tasks, needs input, or
 - ⚡ **Easy control** - Simple slash commands for setup and management
 - 🛡️ **Non-destructive setup** - Preserves existing Claude Code configuration
 - 🔧 **Configurable webhooks** - No hardcoded URLs, bring your own webhook
+- 🐍 **Python-enhanced commands** - Unified architecture with consistent error handling (v0.4.0)
 
 ## 🚀 Quick Install
 
@@ -25,7 +26,9 @@ cd your-project
 curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/install.sh | bash
 ```
 
-**New in v0.3.2**: Automatic hook registration! Discord hooks are now automatically registered in `.claude/settings.json` during local installation.
+**New in v0.4.0**: Python-enhanced slash commands with unified architecture, improved error handling, and consistent user experience!
+
+**Also in v0.3.2**: Automatic hook registration! Discord hooks are now automatically registered in `.claude/settings.json` during local installation.
 
 ### 🌐 Global Installation (Advanced)
 For managing multiple projects with shared Discord integration:
@@ -91,12 +94,22 @@ You'll automatically receive Discord notifications when:
 
 ## 🎮 Available Commands
 
+**Python-Enhanced Slash Commands** (v0.4.0) - Now with unified architecture, improved error handling, and consistent user experience:
+
 | Command | Description |
 |---------|-------------|
 | `/user:discord:setup WEBHOOK_URL [AUTH_TOKEN] [THREAD_ID]` | Setup Discord integration for project |
 | `/user:discord:start [THREAD_ID]` | Enable Discord notifications |
 | `/user:discord:stop` | Disable Discord notifications |
 | `/user:discord:status` | Show current integration status |
+| `/user:discord:remove` | Remove Discord integration from project |
+
+### ✨ Enhanced Features (v0.4.0)
+- **Comprehensive error handling** - User-friendly messages for all edge cases
+- **Consistent formatting** - Uniform output across all commands
+- **Better validation** - Robust webhook URL and argument validation
+- **Installation detection** - Automatic local vs global installation detection
+- **Safe configuration** - Backup creation and selective updates
 
 ## 🛠️ Advanced Usage
 
