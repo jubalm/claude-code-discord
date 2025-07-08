@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2025-07-09
+
+### 🚀 Enhanced Installation Experience
+- **Automatic hook registration** - Local installations now automatically register Discord hooks in `.claude/settings.json`
+- **Reduced setup steps** - Users can start receiving notifications immediately after installation without manual `/user:discord:setup`
+- **Improved integration** - Better handling of existing Claude Code configurations during setup
+- **Streamlined workflow** - Single command now fully configures Discord integration for local projects
+
+### 🔧 Installation Process Improvements
+- **Fixed uninstall confirmation flow** - Improved order of operations in uninstall script for better user experience
+- **Enhanced error handling** - Better user guidance during removal process
+- **Consistent repository URLs** - Fixed final repository URL reference in uninstall script
+
+### 🧹 Repository Cleanup
+- **Removed development artifacts** - Cleaned up `.claude/` directory from repository
+- **Cleaner structure** - Repository now contains only distribution files, no testing artifacts
+
+### 🧪 Comprehensive Testing
+- **Installation scenarios validated** - Local, global, and mixed installation modes tested
+- **Hook execution verified** - All Discord notification types confirmed working in isolation
+- **Uninstall process tested** - Confirmation flow and safety features validated
+- **Path detection confirmed** - Local priority over global installations working correctly
+
+### 📋 Migration Notes
+- **Fully backward compatible** - No breaking changes to existing installations
+- **Automatic benefits** - Existing users will benefit from improved installation experience on next install
+- **Enhanced UX** - New installations require fewer manual steps to become fully functional
+
 ## [0.3.1] - 2025-07-08
 
 ### 🚨 Critical Hotfix

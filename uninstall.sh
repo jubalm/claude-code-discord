@@ -34,19 +34,6 @@ if [ "$GLOBAL_UNINSTALL" = true ]; then
     COMMANDS_DIR="${CLAUDE_HOME}/commands"
     UNINSTALL_MODE="global"
 else
-    # Default: Local uninstall (requires .claude directory)
-    if [ ! -d ".claude" ]; then
-        echo "❌ No .claude directory found in current location."
-        echo ""
-        echo "This appears to be a directory without Discord integration."
-        echo ""
-        echo "Available options:"
-        echo "• Run from a project directory with Discord integration"
-        echo "• Use --global flag to remove global installation:"
-        echo "  curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/uninstall.sh | bash -s -- --global"
-        exit 1
-    fi
-    
     CLAUDE_HOME=".claude"
     HOOKS_DIR="${CLAUDE_HOME}/hooks"
     COMMANDS_DIR="${CLAUDE_HOME}/commands"
@@ -189,6 +176,19 @@ confirm_removal() {
         log_warning "This will remove all global Discord integration components from Claude Code."
         log_warning "Project-specific configuration files (.claude/discord-state.json, .claude/settings.json) will NOT be removed."
     else
+        # For local uninstall, check if .claude directory exists
+        if [ ! -d ".claude" ]; then
+            echo "❌ No .claude directory found in current location."
+            echo ""
+            echo "This appears to be a directory without Discord integration."
+            echo ""
+            echo "Available options:"
+            echo "• Run from a project directory with Discord integration"
+            echo "• Use --global flag to remove global installation:"
+            echo "  curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/uninstall.sh | bash -s -- --global"
+            exit 1
+        fi
+        
         log_warning "This will remove Discord integration from the current project only."
         log_warning "Global components in ~/.claude/ will NOT be affected."
     fi
@@ -272,6 +272,9 @@ main() {
         echo ""
     fi
     
+    # Confirm removal (before checking installation)
+    confirm_removal
+    
     # Check if Discord integration is installed
     if ! check_installation; then
         if [ "$QUIET" = false ]; then
@@ -280,9 +283,6 @@ main() {
         fi
         exit 0
     fi
-    
-    # Confirm removal
-    confirm_removal
     
     # Create backup
     create_backup

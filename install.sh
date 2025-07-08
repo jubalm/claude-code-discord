@@ -219,6 +219,40 @@ install_commands() {
     log_success "Slash commands installed"
 }
 
+# Register Discord hooks in Claude Code settings
+register_hooks() {
+    log_info "Registering Discord hooks in Claude Code..."
+    
+    # For local installations, create/update .claude/settings.json
+    if [ "$GLOBAL_INSTALL" = false ]; then
+        # Create .claude directory if it doesn't exist
+        mkdir -p .claude
+        
+        # Use merge-settings.py to properly register hooks
+        if [ -f ".claude/settings.json" ]; then
+            log_info "Existing .claude/settings.json found - preserving existing hooks..."
+            
+            # Create backup
+            cp .claude/settings.json .claude/settings.json.backup-$(date +%Y%m%d-%H%M%S)
+            log_info "Backup created"
+            
+            # Merge Discord hooks with existing configuration
+            python3 "${COMMANDS_DIR}/discord/merge-settings.py" .claude/settings.json
+            
+            log_success "Discord hooks merged with existing configuration"
+        else
+            log_info "Creating new .claude/settings.json with Discord hooks..."
+            
+            # Create new settings.json with Discord hooks
+            python3 "${COMMANDS_DIR}/discord/merge-settings.py" .claude/settings.json
+            
+            log_success "New .claude/settings.json created with Discord hooks"
+        fi
+    else
+        log_info "Global installation - hooks will be registered per-project via /user:discord:setup"
+    fi
+}
+
 # Verify installation
 verify_installation() {
     log_info "Verifying installation..."
@@ -255,6 +289,22 @@ verify_installation() {
         fi
     done
     
+    # For local installations, verify that .claude/settings.json exists and contains Discord hooks
+    if [ "$GLOBAL_INSTALL" = false ]; then
+        if [ ! -f ".claude/settings.json" ]; then
+            log_error "Local installation missing .claude/settings.json"
+            ((errors++))
+        else
+            # Check if Discord hooks are present in settings.json
+            if ! grep -q "discord" .claude/settings.json; then
+                log_error "Discord hooks not found in .claude/settings.json"
+                ((errors++))
+            else
+                log_success "Discord hooks registered in .claude/settings.json"
+            fi
+        fi
+    fi
+    
     if [ $errors -eq 0 ]; then
         log_success "Installation verification passed"
         return 0
@@ -280,6 +330,7 @@ main() {
     backup_existing
     install_hooks
     install_commands
+    register_hooks
     
     if verify_installation; then
         if [ "$QUIET" = false ]; then
@@ -314,6 +365,9 @@ main() {
                 echo "• /user:discord:stop - Disable notifications"
                 echo "• /user:discord:status - Show current status"
                 echo "• /user:discord:remove - Remove integration"
+                echo ""
+                echo "✅ Discord hooks are already registered in .claude/settings.json"
+                echo "   You can start using Discord notifications immediately after setup!"
             fi
             
             echo ""
