@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-07-08
+
+### 🚨 Critical Hotfix
+- **Fixed installation URL bug** - Corrected GitHub repository URL in install.sh from `claude-discord-integration` to `claude-code-discord`
+- **Fixed uninstall guidance** - Updated error messages to use correct repository URL
+- **Fixed documentation** - Corrected manual installation directory name in README.md
+- **Fixed remove command** - Updated global uninstall instruction in remove.md
+
+### 🔧 Impact
+- **All installations now work** - Both local and global curl installations succeed
+- **File downloads fixed** - All hook scripts and commands download correctly from GitHub
+- **User experience restored** - Single-command installation works as advertised
+
 ## [0.3.0] - 2025-07-08
 
 ### 🏠 Local-First Architecture (Major)

@@ -35,7 +35,7 @@ curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/ins
 ### 🔧 Manual Installation
 ```bash
 git clone https://github.com/jubalm/claude-code-discord.git
-cd claude-discord-integration
+cd claude-code-discord
 chmod +x install.sh
 ./install.sh              # Local installation
 ./install.sh --global     # Global installation

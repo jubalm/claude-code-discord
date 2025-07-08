@@ -43,7 +43,7 @@ else
         echo "Available options:"
         echo "• Run from a project directory with Discord integration"
         echo "• Use --global flag to remove global installation:"
-        echo "  curl -fsSL https://raw.githubusercontent.com/jubalm/claude-discord-integration/main/uninstall.sh | bash -s -- --global"
+        echo "  curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/uninstall.sh | bash -s -- --global"
         exit 1
     fi
     
