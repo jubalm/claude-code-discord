@@ -1,11 +1,13 @@
 # Claude Code Discord Notification
 
-**Stay informed about your Claude Code sessions with real-time Discord notifications - know what Claude is working on even when you're away from your computer**
+**Local-first Discord notifications for Claude Code sessions - stay informed about your coding progress**
 
-Get real-time Discord notifications when Claude completes tasks, needs input, or makes progress on your projects. Each project can independently configure Discord integration without affecting other projects.
+Get real-time Discord notifications when Claude completes tasks, needs input, or makes progress on your projects. **Simple local installation** by default, with optional global setup for advanced multi-project workflows.
 
 ## ✨ Features
 
+- 🏠 **Local-first architecture** - Self-contained installation per project
+- 🌐 **Global option available** - Multi-project setup for advanced users
 - 🎯 **Project-scoped notifications** - Each project controls its own Discord integration
 - 🔔 **Smart notification types** - Input needed, work in progress, session complete
 - 🧵 **Thread support** - Organize notifications by session with Discord threads
@@ -15,23 +17,35 @@ Get real-time Discord notifications when Claude completes tasks, needs input, or
 
 ## 🚀 Quick Install
 
+### 🏠 Local Installation (Recommended)
+Perfect for single projects - everything installs to your current project:
+
 ```bash
+cd your-project
 curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/install.sh | bash
 ```
 
-Or clone and install manually:
+### 🌐 Global Installation (Advanced)
+For managing multiple projects with shared Discord integration:
 
+```bash
+curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/install.sh | bash -s -- --global
+```
+
+### 🔧 Manual Installation
 ```bash
 git clone https://github.com/jubalm/claude-code-discord.git
 cd claude-discord-integration
 chmod +x install.sh
-./install.sh
+./install.sh              # Local installation
+./install.sh --global     # Global installation
 ```
 
 ## 📋 Requirements
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed (global installation only)
 - Python 3 (universally available)
+- `curl` or `wget` for installation
 - Discord webhook URL
 
 ## 🎯 Quick Start
@@ -45,7 +59,7 @@ chmod +x install.sh
 
 ### 2. Setup and Enable
 
-Navigate to your project directory and run:
+After installation, configure Discord integration:
 
 ```bash
 # Setup Discord integration
@@ -53,6 +67,9 @@ Navigate to your project directory and run:
 
 # Enable notifications
 /user:discord:start
+
+# Check installation type
+/user:discord:status
 ```
 
 ### 3. Stay Informed
@@ -83,16 +100,27 @@ You'll automatically receive Discord notifications when:
 
 ### Multiple Projects
 
-Each project is independent. You can have different Discord configurations per project:
-
+**Local Installation**: Each project is completely independent:
 ```bash
-# Project A - posts to #development channel
+# Project A - local installation
 cd /path/to/project-a
+curl -fsSL .../install.sh | bash
 /user:discord:setup https://discord.com/api/webhooks/DEV_WEBHOOK
 
-# Project B - posts to #ai-testing thread  
-cd /path/to/project-b
+# Project B - separate local installation
+cd /path/to/project-b  
+curl -fsSL .../install.sh | bash
 /user:discord:setup https://discord.com/api/webhooks/TEST_WEBHOOK TOKEN THREAD_ID
+```
+
+**Global Installation**: Shared setup across projects:
+```bash
+# One-time global install
+curl -fsSL .../install.sh | bash -s -- --global
+
+# Then configure each project
+cd project-a && /user:discord:setup DEV_WEBHOOK
+cd project-b && /user:discord:setup TEST_WEBHOOK TOKEN THREAD_ID
 ```
 
 ### Discord Threads
@@ -109,23 +137,32 @@ For better organization, you can use Discord threads:
 
 ### Team Collaboration
 
-Commit `.claude/settings.json` to share Discord integration with your team:
-
+**Local Installation (Recommended)**:
 ```bash
-# .gitignore - exclude personal Discord config
-.claude/discord-state.json
-.claude/settings.json.backup
-
-# Commit the hooks configuration for the team
-git add .claude/settings.json
+# Commit Discord integration for team sharing
+git add .claude/hooks/ .claude/commands/ .claude/settings.json
 git commit -m "Add Discord notifications for team"
+
+# .gitignore - exclude personal webhooks
+echo ".claude/discord-state.json" >> .gitignore
+echo ".claude/settings.json.backup*" >> .gitignore
+
+# Team members just need to configure their webhook
+/user:discord:setup https://discord.com/api/webhooks/THEIR_WEBHOOK
+/user:discord:start
 ```
 
-Team members can then add their own webhook:
-
+**Global Installation**:
 ```bash
-# Each team member configures their own webhook
-/user:discord:setup https://discord.com/api/webhooks/THEIR_WEBHOOK
+# Team lead sets up global installation
+curl -fsSL .../install.sh | bash -s -- --global
+
+# Commit project hooks only
+git add .claude/settings.json
+git commit -m "Add Discord hooks config"
+
+# Each team member configures their webhook per project
+/user:discord:setup THEIR_WEBHOOK
 /user:discord:start
 ```
 
@@ -158,47 +195,77 @@ Team members can then add their own webhook:
 
 ### Hook Scripts Not Working
 
-1. Verify scripts exist and are executable:
+1. Check installation type and verify scripts:
    ```bash
+   /user:discord:status  # Shows Local or Global installation
+   
+   # For local installation
+   ls -la .claude/hooks/*discord*.py
+   
+   # For global installation  
    ls -la ~/.claude/hooks/*discord*.py
    ```
 
 2. Test script manually:
    ```bash
+   # Local
+   echo '{}' | .claude/hooks/stop-discord.py
+   
+   # Global
    echo '{}' | ~/.claude/hooks/stop-discord.py
    ```
 
-3. Check script permissions:
+3. Fix permissions if needed:
    ```bash
-   chmod +x ~/.claude/hooks/*discord*.py
+   chmod +x .claude/hooks/*discord*.py      # Local
+   chmod +x ~/.claude/hooks/*discord*.py   # Global
    ```
 
 ### Commands Not Available
 
-1. Verify commands directory:
+1. Verify commands based on installation type:
    ```bash
+   # Local
+   ls .claude/commands/discord/
+   
+   # Global
    ls ~/.claude/commands/discord/
    ```
 
 2. Restart Claude Code to reload commands
 
-3. Try with full command prefix:
+3. Check installation type:
    ```bash
    /user:discord:status
    ```
 
 ## 🗑️ Uninstallation
 
+### Local Uninstall (Default)
+Remove Discord integration from current project:
 ```bash
-# Download and run uninstall script
 curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/uninstall.sh | bash
 
-# Or manually remove files
+# Or use slash command
+/user:discord:remove
+```
+
+### Global Uninstall
+Remove global Discord integration (affects all projects):
+```bash
+curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/uninstall.sh | bash -s -- --global
+```
+
+### Manual Cleanup
+```bash
+# Local installation
+rm -rf .claude/hooks/*discord*.py .claude/commands/discord/
+rm -f .claude/discord-state.json
+
+# Global installation  
 rm -f ~/.claude/hooks/*discord*.py
 rm -rf ~/.claude/commands/discord
 ```
-
-Note: This only removes global components. Project-specific `.claude/` files remain.
 
 ## 🤝 Contributing
 

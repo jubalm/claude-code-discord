@@ -5,6 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-07-08
+
+### 🏠 Local-First Architecture (Major)
+- **Default installation changed to local** - `curl | bash` now installs to current project (`.claude/` directory) instead of global (`~/.claude/`)
+- **Self-contained project installations** - Each project includes complete Discord integration (hooks, commands, utilities)
+- **GitHub file downloads** - Installation script downloads files from GitHub, removing dependency on local repository
+- **Simplified user onboarding** - Single command setup: `curl | bash && /user:discord:setup && /user:discord:start`
+
+### 🌐 Global Installation Option (Advanced Users)
+- **Added `--global` flag** - `curl | bash -s -- --global` for traditional multi-project installation
+- **Intelligent path detection** - System automatically detects local vs global installation and uses appropriate paths
+- **Local takes priority** - When both local and global installations exist, local is used (prevents conflicts)
+- **Backward compatibility** - Existing global installations continue working without changes
+
+### 🔧 Enhanced Safety & Configuration Management
+- **Smart settings.json merging** - `merge-settings.py` automatically detects installation type and uses correct paths
+- **Safe uninstall operations** - Surgical removal of Discord hooks while preserving other settings
+- **Automatic backup creation** - All configuration changes create timestamped backups
+- **Settings preservation** - Installation preserves existing Claude Code configurations
+
+### 🛡️ Improved Error Handling & User Guidance
+- **Local uninstall detection** - Uninstall script detects when run in directory without `.claude/` and provides helpful guidance
+- **Installation type visibility** - `/user:discord:status` shows whether using "Local" or "Global" installation
+- **Clear error messages** - Helpful instructions when operations fail (e.g., suggests `--global` flag when appropriate)
+- **Command availability detection** - Scripts automatically find commands in local or global locations
+
+### 📚 Complete Documentation Overhaul
+- **CLAUDE.md rewrite** - Comprehensive documentation covering both local and global architectures
+- **README.md transformation** - New user guide focused on local-first workflow with global options
+- **Updated examples** - All code examples reflect new local-first approach
+- **Enhanced troubleshooting** - Separate guidance for local vs global installation issues
+
+### ⚡ User Experience Improvements
+- **One-command installation** - No need for separate install + setup steps for most users
+- **Installation type indicators** - Commands show whether using local or global setup
+- **Flexible team collaboration** - Support for both local (committed files) and global (shared setup) workflows
+- **Reduced cognitive load** - Simpler mental model for typical single-project users
+
+### 🔄 Breaking Changes
+- **Default installation location changed** - From `~/.claude/` to `.claude/` (current directory)
+- **Uninstall behavior changed** - Default removes local installation, requires `--global` for global removal
+- **Installation requirements** - curl/wget required for GitHub downloads (Python 3 still required)
+
+### 🧪 Comprehensive Testing
+- **10 test scenarios validated** - Local, global, mixed, error handling, edge cases all verified
+- **Path detection tested** - Confirmed local takes priority over global in mixed scenarios
+- **Settings safety verified** - Backup creation and surgical hook removal working correctly
+- **Error handling confirmed** - Proper guidance provided for all failure scenarios
+
 ## [0.2.2] - 2025-07-08
 
 ### 📚 Documentation Updates

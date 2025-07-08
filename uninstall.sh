@@ -1,13 +1,57 @@
 #!/bin/bash
 
 # Claude Discord Integration Uninstaller
-# Removes global Discord integration components from Claude Code
+# Local-first uninstaller with global option
+# Usage: ./uninstall.sh [--global] [--quiet]
 
 set -e
 
-CLAUDE_HOME="${HOME}/.claude"
-HOOKS_DIR="${CLAUDE_HOME}/hooks"
-COMMANDS_DIR="${CLAUDE_HOME}/commands"
+# Parse command line arguments
+GLOBAL_UNINSTALL=false
+QUIET=false
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --global)
+            GLOBAL_UNINSTALL=true
+            shift
+            ;;
+        --quiet)
+            QUIET=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Usage: $0 [--global] [--quiet]"
+            exit 1
+            ;;
+    esac
+done
+
+# Determine uninstall mode and paths
+if [ "$GLOBAL_UNINSTALL" = true ]; then
+    CLAUDE_HOME="${HOME}/.claude"
+    HOOKS_DIR="${CLAUDE_HOME}/hooks"
+    COMMANDS_DIR="${CLAUDE_HOME}/commands"
+    UNINSTALL_MODE="global"
+else
+    # Default: Local uninstall (requires .claude directory)
+    if [ ! -d ".claude" ]; then
+        echo "❌ No .claude directory found in current location."
+        echo ""
+        echo "This appears to be a directory without Discord integration."
+        echo ""
+        echo "Available options:"
+        echo "• Run from a project directory with Discord integration"
+        echo "• Use --global flag to remove global installation:"
+        echo "  curl -fsSL https://raw.githubusercontent.com/jubalm/claude-discord-integration/main/uninstall.sh | bash -s -- --global"
+        exit 1
+    fi
+    
+    CLAUDE_HOME=".claude"
+    HOOKS_DIR="${CLAUDE_HOME}/hooks"
+    COMMANDS_DIR="${CLAUDE_HOME}/commands"
+    UNINSTALL_MODE="local"
+fi
 
 # Colors for output
 RED='\033[0;31m'
@@ -18,15 +62,21 @@ NC='\033[0m' # No Color
 
 # Helper functions
 log_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+    if [ "$QUIET" = false ]; then
+        echo -e "${BLUE}[INFO]${NC} $1"
+    fi
 }
 
 log_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
+    if [ "$QUIET" = false ]; then
+        echo -e "${GREEN}[SUCCESS]${NC} $1"
+    fi
 }
 
 log_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
+    if [ "$QUIET" = false ]; then
+        echo -e "${YELLOW}[WARNING]${NC} $1"
+    fi
 }
 
 log_error() {
@@ -130,9 +180,18 @@ verify_removal() {
 
 # Prompt for confirmation
 confirm_removal() {
+    if [ "$QUIET" = true ]; then
+        return 0  # Skip confirmation in quiet mode
+    fi
+    
     echo ""
-    log_warning "This will remove all global Discord integration components from Claude Code."
-    log_warning "Project-specific configuration files (.claude/discord-state.json, .claude/settings.json) will NOT be removed."
+    if [ "$GLOBAL_UNINSTALL" = true ]; then
+        log_warning "This will remove all global Discord integration components from Claude Code."
+        log_warning "Project-specific configuration files (.claude/discord-state.json, .claude/settings.json) will NOT be removed."
+    else
+        log_warning "This will remove Discord integration from the current project only."
+        log_warning "Global components in ~/.claude/ will NOT be affected."
+    fi
     echo ""
     
     read -p "Are you sure you want to continue? (y/N): " -n 1 -r
@@ -144,23 +203,81 @@ confirm_removal() {
     fi
 }
 
+# Remove settings.json hooks safely (local uninstall only)
+remove_settings_hooks() {
+    if [ "$GLOBAL_UNINSTALL" = true ]; then
+        return 0  # Skip for global uninstall
+    fi
+    
+    if [ ! -f ".claude/settings.json" ]; then
+        log_info "No settings.json file to clean"
+        return 0
+    fi
+    
+    log_info "Removing Discord hooks from settings.json..."
+    
+    # Create backup
+    cp .claude/settings.json .claude/settings.json.backup-$(date +%Y%m%d-%H%M%S)
+    
+    # Use the same Python code as in remove.md to safely remove hooks
+    python3 -c "
+import json
+import sys
+
+try:
+    with open('.claude/settings.json', 'r') as f:
+        settings = json.load(f)
+    
+    if 'hooks' in settings:
+        # Remove Discord hooks while preserving others
+        hooks = settings['hooks']
+        
+        # Remove Stop hooks that point to Discord
+        if 'Stop' in hooks:
+            hooks['Stop'] = [h for h in hooks['Stop'] if not any('discord' in hook.get('command', '') for hook in h.get('hooks', []))]
+            if not hooks['Stop']:
+                del hooks['Stop']
+        
+        # Remove Notification hooks that point to Discord  
+        if 'Notification' in hooks:
+            hooks['Notification'] = [h for h in hooks['Notification'] if not any('discord' in hook.get('command', '') for hook in h.get('hooks', []))]
+            if not hooks['Notification']:
+                del hooks['Notification']
+        
+        # Remove PostToolUse hooks that point to Discord
+        if 'PostToolUse' in hooks:
+            hooks['PostToolUse'] = [h for h in hooks['PostToolUse'] if not any('discord' in hook.get('command', '') for hook in h.get('hooks', []))]
+            if not hooks['PostToolUse']:
+                del hooks['PostToolUse']
+    
+    # Write back the cleaned settings
+    with open('.claude/settings.json', 'w') as f:
+        json.dump(settings, f, indent=2)
+    
+    print('✅ Discord hooks removed from settings.json')
+
+except Exception as e:
+    print(f'❌ Error updating settings.json: {e}')
+    sys.exit(1)
+"
+}
+
 # Main uninstallation function
 main() {
-    echo "=================================================="
-    echo "Claude Discord Integration Uninstaller"
-    echo "=================================================="
-    echo ""
-    
-    # Check if Claude Code directory exists
-    if [ ! -d "$CLAUDE_HOME" ]; then
-        log_error "Claude Code directory not found at $CLAUDE_HOME"
-        exit 1
+    if [ "$QUIET" = false ]; then
+        echo "=================================================="
+        echo "Claude Discord Integration Uninstaller"
+        echo "Uninstall Mode: $UNINSTALL_MODE"
+        echo "=================================================="
+        echo ""
     fi
     
     # Check if Discord integration is installed
     if ! check_installation; then
-        echo ""
-        log_info "Nothing to uninstall. Exiting."
+        if [ "$QUIET" = false ]; then
+            echo ""
+            log_info "Nothing to uninstall. Exiting."
+        fi
         exit 0
     fi
     
@@ -173,28 +290,52 @@ main() {
     # Remove components
     remove_hooks
     remove_commands
+    remove_settings_hooks
+    
+    # Remove discord-state.json for local uninstalls
+    if [ "$GLOBAL_UNINSTALL" = false ] && [ -f ".claude/discord-state.json" ]; then
+        log_info "Removing discord-state.json..."
+        rm -f .claude/discord-state.json
+        log_success "Removed discord-state.json"
+    fi
     
     # Verify removal
     if verify_removal; then
-        echo ""
-        echo "=================================================="
-        log_success "Uninstallation completed successfully!"
-        echo "=================================================="
-        echo ""
-        log_info "What was removed:"
-        echo "• Global hook scripts from ~/.claude/hooks/"
-        echo "• Global slash commands from ~/.claude/commands/discord/"
-        echo ""
-        log_warning "What was NOT removed:"
-        echo "• Project-specific .claude/discord-state.json files"
-        echo "• Project-specific .claude/settings.json files"
-        echo "• Any Discord webhook configurations"
-        echo ""
-        log_info "To remove project-specific configuration, manually delete:"
-        echo "• .claude/discord-state.json in each project"
-        echo "• Discord hooks from .claude/settings.json in each project"
-        echo ""
-        log_info "Backup created for safety - you can restore if needed"
+        if [ "$QUIET" = false ]; then
+            echo ""
+            echo "=================================================="
+            log_success "Uninstallation completed successfully!"
+            echo "=================================================="
+            echo ""
+            
+            if [ "$GLOBAL_UNINSTALL" = true ]; then
+                log_info "What was removed:"
+                echo "• Global hook scripts from ~/.claude/hooks/"
+                echo "• Global slash commands from ~/.claude/commands/discord/"
+                echo ""
+                log_warning "What was NOT removed:"
+                echo "• Project-specific .claude/discord-state.json files"
+                echo "• Project-specific .claude/settings.json files"
+                echo "• Any Discord webhook configurations"
+                echo ""
+                log_info "To remove project-specific configuration:"
+                echo "• Use /user:discord:remove in each project"
+                echo "• Or manually delete .claude/discord-state.json files"
+            else
+                log_info "What was removed:"
+                echo "• Local hook scripts from .claude/hooks/"
+                echo "• Local slash commands from .claude/commands/discord/"
+                echo "• Discord hooks from .claude/settings.json"
+                echo "• .claude/discord-state.json (if present)"
+                echo ""
+                log_warning "What was NOT removed:"
+                echo "• Global components in ~/.claude/"
+                echo "• Other hooks and settings in .claude/settings.json"
+            fi
+            
+            echo ""
+            log_info "Backup created for safety - you can restore if needed"
+        fi
     else
         echo ""
         log_error "Uninstallation completed with errors. Please check the issues above."

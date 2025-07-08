@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/stop-discord.py"
+            "command": ".claude/hooks/stop-discord.py"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/notification-discord.py"
+            "command": ".claude/hooks/notification-discord.py"
           }
         ]
       }
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/posttooluse-discord.py"
+            "command": ".claude/hooks/posttooluse-discord.py"
           }
         ]
       }

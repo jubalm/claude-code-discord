@@ -4,75 +4,94 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is **Claude Code Discord Notification** (version 0.1.1) - a system that provides project-scoped Discord notifications for Claude Code sessions. Stay informed about your Claude Code sessions with real-time Discord notifications - know what Claude is working on even when you're away from your computer.
+This is **Claude Code Discord Notification** (version 0.3.0) - a **local-first** Discord notification system for Claude Code sessions. Stay informed about your coding sessions with real-time Discord notifications - know what Claude is working on even when you're away from your computer.
+
+**Local-First Architecture**: By default, Discord integration installs directly to your current project (`.claude/` directory), making setup simple and self-contained. Advanced users can optionally install globally for multi-project workflows.
 
 The system uses Python scripts, shell hooks, and custom slash commands to send real-time notifications when Claude completes tasks, needs input, or makes progress on projects.
 
 ## Installation and Setup Commands
 
-### Install the Integration System
+### 🚀 Quick Start (Local Installation - Recommended)
 ```bash
-# Install globally to Claude Code
-chmod +x install.sh
-./install.sh
+# Navigate to your project directory
+cd my-awesome-project
 
-# Or quick install
+# One-command install (local to current project)
 curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/install.sh | bash
-```
 
-### Uninstall
-```bash
-# Remove global components
-chmod +x uninstall.sh
-./uninstall.sh
-```
-
-### Remove Project Integration
-```bash
-# Remove Discord integration from current project only
-/user:discord:remove
-
-# This removes:
-# - .claude/discord-state.json
-# - Discord hooks from .claude/settings.json
-# - Preserves other hooks and global components
-```
-
-### Project Setup (in any project directory)
-```bash
-# Basic setup
+# Setup Discord integration
 /user:discord:setup https://discord.com/api/webhooks/YOUR_WEBHOOK_URL
 
-# With auth token and thread support
-/user:discord:setup YOUR_WEBHOOK_URL YOUR_AUTH_TOKEN THREAD_ID
+# Start receiving notifications
+/user:discord:start
+```
 
-# Enable notifications
+### 🌐 Advanced Setup (Global Installation)
+```bash
+# Install globally for multi-project use
+curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/install.sh | bash -s -- --global
+
+# Then in each project:
+cd project1
+/user:discord:setup YOUR_WEBHOOK_URL
 /user:discord:start
 
-# Check status
-/user:discord:status
+cd project2
+/user:discord:setup YOUR_WEBHOOK_URL
+/user:discord:start
+```
 
-# Disable notifications
-/user:discord:stop
+### 🗑️ Uninstall Options
+```bash
+# Remove from current project (default)
+curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/uninstall.sh | bash
 
-# Remove project integration
+# Remove global installation
+curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/uninstall.sh | bash -s -- --global
+
+# Remove via slash command (project only)
 /user:discord:remove
+```
+
+### 📋 All Available Commands
+```bash
+# Setup and management
+/user:discord:setup WEBHOOK_URL [AUTH_TOKEN] [THREAD_ID]  # Configure integration
+/user:discord:start [THREAD_ID]                          # Enable notifications
+/user:discord:stop                                       # Disable notifications
+/user:discord:status                                     # Check current state
+/user:discord:remove                                     # Remove integration
 ```
 
 ## Architecture
 
-### Global Components (`~/.claude/`)
-- **Hook Scripts**: `hooks/stop-discord.py`, `hooks/posttooluse-discord.py`, `hooks/notification-discord.py`
-- **Slash Commands**: `commands/discord/` (setup.md, start.md, stop.md, status.md)
-- **No Global Settings**: Global settings.json has no hooks configured
+### 🏠 Local-First Design (Default)
+**Installation Location**: `.claude/` in current project directory
+- **Hook Scripts**: `.claude/hooks/` (stop-discord.py, posttooluse-discord.py, notification-discord.py)
+- **Slash Commands**: `.claude/commands/discord/` (setup.md, start.md, stop.md, status.md, remove.md)
+- **Python Utilities**: `.claude/commands/discord/` (merge-settings.py, update-state.py, read-state.py)
+- **Project State**: `.claude/discord-state.json` (webhook URL, auth token, thread ID, active state)
+- **Hooks Configuration**: `.claude/settings.json` (project-specific hooks)
 
-### Project Components (`.claude/` in each project)
-- **settings.json**: Project-specific hooks configuration (only created when opted in)
-- **discord-state.json**: Discord webhook URL, auth token, thread ID, and active state
-- **settings.json.backup**: Backup of existing settings when merging hooks
+### 🌐 Global Installation (Advanced)
+**Installation Location**: `~/.claude/` for multi-project use
+- **Hook Scripts**: `~/.claude/hooks/` (shared across all projects)
+- **Slash Commands**: `~/.claude/commands/discord/` (available in all projects)
+- **Per-Project State**: Each project still has its own `.claude/discord-state.json`
+- **Per-Project Settings**: Each project has its own `.claude/settings.json`
 
-### Key Design Principle
-Projects without `.claude/discord-state.json` receive **no notifications** - this ensures complete project isolation.
+### 🔧 Intelligent Path Detection
+The system automatically detects installation type:
+1. **Local Priority**: If `.claude/hooks/stop-discord.py` exists, uses local installation
+2. **Global Fallback**: If local not found, uses global installation (`~/.claude/`)
+3. **Mixed Support**: Both installations can coexist, local takes priority
+
+### Key Design Principles
+- **Project Isolation**: Only projects with `.claude/discord-state.json` receive notifications
+- **Self-Contained**: Local installations include everything needed for Discord integration
+- **Safe Cleanup**: Uninstall operations preserve non-Discord hooks and settings
+- **Backward Compatible**: Existing global installations continue working
 
 ## Discord Notification Types
 
@@ -96,25 +115,34 @@ Each Python hook script follows this pattern:
 
 ### Core Hook Scripts
 - `hooks/stop-discord.py`: Handler for Stop events (session completion)
-- `hooks/posttooluse-discord.py`: Handler for tool completion events
+- `hooks/posttooluse-discord.py`: Handler for tool completion events  
 - `hooks/notification-discord.py`: Handler for input-needed events
 
 ### Slash Commands (Custom Claude Code Commands)
-- `commands/discord/setup.md`: Creates project config and hooks
+- `commands/discord/setup.md`: Creates project config and hooks with path detection
 - `commands/discord/start.md`: Enables notifications
-- `commands/discord/stop.md`: Disables notifications  
-- `commands/discord/status.md`: Shows current configuration
+- `commands/discord/stop.md`: Disables notifications
+- `commands/discord/status.md`: Shows current configuration and installation type
+- `commands/discord/remove.md`: Removes project integration safely
+
+### Python Utilities
+- `commands/discord/merge-settings.py`: Intelligently merges Discord hooks with path detection
+- `commands/discord/update-state.py`: Updates discord-state.json (start/stop/thread management)
+- `commands/discord/read-state.py`: Reads values from discord-state.json
 
 ### Installation Scripts
-- `install.sh`: Installs global components, checks dependencies (jq, curl), creates backups
-- `uninstall.sh`: Removes global components, preserves project configs
+- `install.sh`: Local-first installer with GitHub downloads, supports `--global` flag
+- `uninstall.sh`: Local-first uninstaller with safe cleanup, supports `--global` flag
 
 ## Dependencies
 
 Required tools:
-- `jq` for JSON processing
-- `curl` for HTTP requests
-- `bash` for script execution
+- `python3` for all hook scripts and utilities
+- `curl` or `wget` for HTTP requests and GitHub downloads
+- `bash` for installation and uninstall scripts
+
+Optional tools (legacy support):
+- `jq` (no longer required, replaced with Python JSON processing)
 
 ## Configuration Files
 
@@ -130,6 +158,18 @@ Required tools:
 ```
 
 ### `.claude/settings.json` (hooks configuration)
+**Local Installation Example:**
+```json
+{
+  "hooks": {
+    "Stop": [{"matcher": "", "hooks": [{"type": "command", "command": ".claude/hooks/stop-discord.py"}]}],
+    "Notification": [{"matcher": "", "hooks": [{"type": "command", "command": ".claude/hooks/notification-discord.py"}]}],
+    "PostToolUse": [{"matcher": "", "hooks": [{"type": "command", "command": ".claude/hooks/posttooluse-discord.py"}]}]
+  }
+}
+```
+
+**Global Installation Example:**
 ```json
 {
   "hooks": {
@@ -140,17 +180,25 @@ Required tools:
 }
 ```
 
+*Note: Path detection is automatic - the system chooses local or global paths based on installation type.*
+
 ## Development and Testing
 
 ### Testing Hook Scripts
 ```bash
-# Test hook manually
+# Test local hook manually
+echo '{"session_id": "test", "hook_type": "Stop"}' | python3 .claude/hooks/stop-discord.py
+
+# Test global hook manually
 echo '{"session_id": "test", "hook_type": "Stop"}' | python3 ~/.claude/hooks/stop-discord.py
 
 # Check logs
 tail -f ~/.claude/discord-notifications.log
 
-# Verify script permissions
+# Verify script permissions (local)
+ls -la .claude/hooks/*discord*.py
+
+# Verify script permissions (global)
 ls -la ~/.claude/hooks/*discord*.py
 ```
 
@@ -160,56 +208,113 @@ ls -la ~/.claude/hooks/*discord*.py
 /user:discord:status
 /user:discord:setup test_webhook_url
 /user:discord:start
+
+# Check installation type
+/user:discord:status  # Shows "Local" or "Global" installation
+```
+
+### Testing Installation Types
+```bash
+# Test local installation
+curl -fsSL .../install.sh | bash
+/user:discord:status  # Should show "Local (project-specific)"
+
+# Test global installation
+curl -fsSL .../install.sh | bash -s -- --global
+/user:discord:status  # Should show "Global (multi-project)"
+
+# Test uninstall
+curl -fsSL .../uninstall.sh | bash  # Local uninstall
+curl -fsSL .../uninstall.sh | bash -s -- --global  # Global uninstall
 ```
 
 ### Comprehensive Testing Instructions
 
 For thorough testing of the Discord notification system:
 
-1. **Navigate to a test project folder**:
+1. **Test Local Installation (Default)**:
    ```bash
-   cd /path/to/your/test-project
-   ```
-
-2. **Set up Discord integration**:
-   ```bash
-   # Use a test webhook URL
+   cd /path/to/test-project
+   curl -fsSL .../install.sh | bash
    /user:discord:setup https://discord.com/api/webhooks/YOUR_WEBHOOK_URL
    /user:discord:start
+   /user:discord:status  # Should show "Local (project-specific)"
    ```
 
-3. **Test notification types**:
-   - Make file edits → Should trigger PostToolUse notifications
-   - Complete session → Should trigger Stop notification
-   - Cause Claude to need input → Should trigger Notification
-
-4. **Check status and logs**:
+2. **Test Global Installation**:
    ```bash
-   /user:discord:status
-   tail -f ~/.claude/discord-notifications.log
+   curl -fsSL .../install.sh | bash -s -- --global
+   cd project1
+   /user:discord:setup YOUR_WEBHOOK_URL
+   /user:discord:start
+   /user:discord:status  # Should show "Global (multi-project)"
    ```
 
-5. **Test thread mode**:
+3. **Test Mixed Scenarios**:
    ```bash
-   /user:discord:start THREAD_ID
+   # Install both local and global
+   curl -fsSL .../install.sh | bash -s -- --global
+   curl -fsSL .../install.sh | bash
+   /user:discord:status  # Should show "Local" (local takes priority)
    ```
 
-6. **Test configuration preservation**:
-   - Run setup in project with existing `.claude/settings.json`
-   - Verify backup is created and settings are merged
+4. **Test Notification Types**:
+   - Make file edits → PostToolUse notifications
+   - Complete session → Stop notification  
+   - Need user input → Notification
+
+5. **Test Uninstall Options**:
+   ```bash
+   # Local uninstall (default)
+   curl -fsSL .../uninstall.sh | bash
+   
+   # Global uninstall
+   curl -fsSL .../uninstall.sh | bash -s -- --global
+   
+   # Error handling (no .claude directory)
+   cd random-directory
+   curl -fsSL .../uninstall.sh | bash  # Should show helpful error
+   ```
+
+6. **Test Configuration Safety**:
+   - Existing `.claude/settings.json` preservation
+   - Backup creation during setup/removal
+   - Settings merge functionality
 
 ### Common Issues
 - **No notifications**: Check if `.claude/discord-state.json` exists and `"active": true`
 - **Permission errors**: Ensure hook scripts are executable (`chmod +x`)
-- **JSON parsing errors**: Verify `jq` is installed and config files are valid JSON
-- **Command not found**: Verify commands exist in `~/.claude/commands/discord/`
+- **JSON parsing errors**: Verify config files are valid JSON (Python handles parsing)
+- **Command not found**: Verify commands exist in `.claude/commands/discord/` or `~/.claude/commands/discord/`
+- **Path detection issues**: Check installation type with `/user:discord:status`
+- **Mixed installations**: Local takes priority - remove local if you want global behavior
 
 ## Team Collaboration
 
-The system supports team collaboration:
-- Commit `.claude/settings.json` to share hook configuration
-- Add `.claude/discord-state.json` to `.gitignore` for personal webhook URLs
-- Each team member configures their own webhook with `/user:discord:setup`
+The system supports team collaboration with both local and global installations:
+
+### Recommended Approach (Local Installation)
+- **Commit**: `.claude/settings.json` to share hook configuration with team
+- **Gitignore**: `.claude/discord-state.json` for personal webhook URLs
+- **Team Setup**: Each member runs `/user:discord:setup` with their webhook
+- **Consistent**: All team members get the same local installation
+
+### Alternative Approach (Global Installation)
+- **Team Leader**: Sets up global installation for consistency
+- **Individual Setup**: Each member configures per-project webhooks
+- **Flexibility**: Different projects can use different global configurations
+
+### .gitignore Recommendations
+```
+# Discord integration (personal webhook URLs)
+.claude/discord-state.json
+.claude/settings.json.backup*
+
+# Keep these for team sharing
+# .claude/settings.json (hook configuration)
+# .claude/hooks/ (if using local installation)
+# .claude/commands/ (if using local installation)
+```
 
 ## Claude Code Documentation References
 
