@@ -132,4 +132,4 @@ except Exception as e:
 ! echo "  • /user:discord:setup WEBHOOK_URL - Reconfigure"
 ! echo ""
 ! echo "🗑️  To completely remove global Discord components:"
-! echo "  • Run ./uninstall.sh from the claude-discord-integration directory"
+! echo "  • curl -fsSL https://raw.githubusercontent.com/jubalm/claude-code-discord/main/uninstall.sh | bash -s -- --global"

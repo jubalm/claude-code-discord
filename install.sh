@@ -41,7 +41,7 @@ else
 fi
 
 # GitHub repository base URL
-GITHUB_BASE="https://raw.githubusercontent.com/jubalm/claude-discord-integration/main"
+GITHUB_BASE="https://raw.githubusercontent.com/jubalm/claude-code-discord/main"
 
 # Colors for output
 RED='\033[0;31m'
